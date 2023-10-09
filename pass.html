@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pass(phrase)word Generator</title>
+</head>
+<body>
+    <h1>Meow.</h1>
+    <p>Click the buttons below to generate a random passphrase and password:</p>
+    <button id="generatePassphrase">Generate Passphrase</button>
+    <button id="generatePassword">Generate Password</button>
+    <p>Generated Passphrase: <span id="passphrase"></span></p>
+    <p>Generated Password: <span id="password"></span></p>
+    <p>Passphrase Entropy: <span id="passphraseEntropy"></span> bits</p>
+    <p>Password Entropy: <span id="passwordEntropy"></span> bits</p>
+
+    <script>
+        // Variable to store the Bible words
+        let bibleWords = [];
+
+        // Function to fetch and parse the BIP  text
+        async function fetchLocalBibleText() {
+            const response = await fetch('bip39.txt');
+            const bibleText = await response.text();
+            bibleWords = bibleText.split(/\s+/);
+        }
+
+        // Function to generate a random passphrase using Bible words
+        function generatePassphrase() {
+            const passphraseLength = 15; // You can adjust the length as needed
+            let passphrase = "";
+
+            for (let i = 0; i < passphraseLength; i++) {
+                const randomIndex = Math.floor(Math.random() * bibleWords.length);
+                passphrase += bibleWords[randomIndex] + " ";
+            }
+
+            return passphrase.trim();
+        }
+
+        // Function to generate a random password
+        function generatePassword() {
+            const passwordLength = 32; // 32 bytes (256 bits)
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+            let password = "";
+
+            for (let i = 0; i < passwordLength; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset.charAt(randomIndex);
+            }
+
+            return password;
+        }
+
+        // Function to calculate the entropy of a string
+        function calculateEntropy(string) {
+            const charsetSize = 72; // Size of the character set used in the password generation
+            const stringLength = string.length;
+            const entropy = Math.log2(Math.pow(charsetSize, stringLength));
+            return entropy.toFixed(2);
+        }
+
+        // Event listener for generating passphrase
+        document.getElementById("generatePassphrase").addEventListener("click", function () {
+            const generatedPassphrase = generatePassphrase();
+            const passphraseEntropy = calculateEntropy(generatedPassphrase);
+
+            document.getElementById("passphrase").textContent = generatedPassphrase;
+            document.getElementById("passphraseEntropy").textContent = passphraseEntropy;
+        });
+
+        // Event listener for generating password
+        document.getElementById("generatePassword").addEventListener("click", function () {
+            const generatedPassword = generatePassword();
+            const passwordEntropy = calculateEntropy(generatedPassword);
+
+            document.getElementById("password").textContent = generatedPassword;
+            document.getElementById("passwordEntropy").textContent = passwordEntropy;
+        });
+
+        // Fetch the local Bible text and display initial entropy values when the page loads
+        fetchLocalBibleText();
+        document.getElementById("passphraseEntropy").textContent = "0.00";
+        document.getElementById("passwordEntropy").textContent = "0.00";
+    </script>
+</body>
+</html>
+
